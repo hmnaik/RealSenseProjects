@@ -10,8 +10,8 @@ import pyrealsense2 as rs
 import cv2 as cv
 import numpy as np
 
-outputVideo = cv.VideoWriter('testColor_device1.mp4',0x00000020, 30.0, (1280,720), True)
-outputDepth = cv.VideoWriter('testDepth_device1.mp4',0x00000020, 30.0, (1280,720), True)
+outputVideo = cv.VideoWriter('05252018\\testColor_device1_pg_scene1_pt5.mp4',0x00000020, 30.0, (1280,720), True)
+outputDepth = cv.VideoWriter('05252018\\testDepth_device1_pg_scene1_pt5.mp4',0x00000020, 30.0, (1280,720), True)
 
 windowName = 'combinedImages'
 cv.namedWindow(windowName,cv.WINDOW_NORMAL)
@@ -53,12 +53,14 @@ try:
         depth_img = np.asanyarray(aligned_depth.get_data())
         color_img = np.asanyarray(aligned_color.get_data())
 
+        depth_img_3d = np.dstack((depth_img,depth_img,depth_img))
         depth_img_colormap = cv.applyColorMap(cv.convertScaleAbs(depth_img, alpha=0.03), cv.COLORMAP_JET)
         combinedImages = np.hstack((color_img, depth_img_colormap))
+
         if record:
             cv.circle(combinedImages, (20,20), 5 , (0,0,255), -1 )
             outputVideo.write(color_img)
-            outputDepth.write(depth_img)
+            outputDepth.write(depth_img_colormap)
 
         # Show the combined image
         cv.imshow(windowName, combinedImages)
@@ -66,6 +68,7 @@ try:
         key = cv.waitKey(1)
         if key == ord('q'):
             outputVideo.release()
+            outputDepth.release()
             cv.destroyAllWindows()
             break
 
