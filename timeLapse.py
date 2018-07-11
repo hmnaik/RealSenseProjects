@@ -2,46 +2,17 @@
 ## Copyright(c) 2015-2017 Intel Corporation. All Rights Reserved.
 
 #####################################################
-## librealsense tutorial #1 - Accessing depth data ##
+## librealsense tutorial #1 - Recording time lapse information of the color and depth ##
 #####################################################
-
-
-
 
 # First import the library
 import pyrealsense2 as rs
 import cv2 as cv
 import numpy as np
-from datetime import date, time, datetime
-import os
+import time
 
-
-def getDateTimeInfo():
-
-    dateTime = datetime.now()
-    # String for date
-    dateString = dateTime.strftime("%m%d%Y") # Format : MMDDYYYY
-    #dateString = str(dateInfo.year) + str(dateInfo.month) + str(dateInfo.day)
-    # String for time
-    timeString = dateTime.strftime("%H%M%S")
-
-    return dateString, timeString
-
-# Get date time info
-dateStr, timeStr = getDateTimeInfo()
-
-if os.path.exists( os.path.join(os.getcwd(),dateStr)):
-    print("Yes")
-else:
-    os.mkdir(os.path.join(os.getcwd(),dateStr))
-
-depthFileName = dateStr + "_device1_pg_" + timeStr + ".mp4"
-colorFileName = dateStr + "_device1_pg_" + timeStr + ".mp4"
-outputDepthPath = os.path.join(os.getcwd(),dateStr, depthFileName )
-outputVideoPath = os.path.join(os.getcwd(),dateStr, depthFileName )
-
-outputVideo = cv.VideoWriter(depthFileName,0x00000020, 30.0, (1280,720), True)
-outputDepth = cv.VideoWriter(colorFileName,0x00000020, 30.0, (1280,720), True)
+outputVideo = cv.VideoWriter('07102018\\device1_pg_scene1_pt5.mp4',0x00000020, 30.0, (1280,720), True)
+outputDepth = cv.VideoWriter('07102018\\device1_pg_scene1_pt5.mp4',0x00000020, 30.0, (1280,720), True)
 
 windowName = 'combinedImages'
 cv.namedWindow(windowName,cv.WINDOW_NORMAL)
@@ -66,6 +37,8 @@ try:
     align_to = rs.stream.color
     align = rs.align(align_to)
 
+    sleeptime = 10
+
     while True:
         # This call waits until a new coherent set of frames is available on a device
         # Calls to get_frame_data(...) and get_frame_timestamp(...) on a device will return stable values until wait_for_frames(...) is called
@@ -88,6 +61,7 @@ try:
         combinedImages = np.hstack((color_img, depth_img_colormap))
 
         if record:
+            time.sleep(sleeptime)
             cv.circle(combinedImages, (20,20), 5 , (0,0,255), -1 )
             outputVideo.write(color_img)
             outputDepth.write(depth_img_colormap)
